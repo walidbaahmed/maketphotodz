@@ -21,13 +21,14 @@ st.set_page_config(
 )
 
 # ==================== CONFIGURATION SUPABASE ====================
-# Les clés sont maintenant dans Streamlit Secrets (sécurisé)
+# Clés sécurisées via Streamlit Secrets
 
 try:
     SUPABASE_URL = st.secrets["SUPABASE_URL"]
     SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 except Exception as e:
-    st.error("⚠️ Configurez vos clés Supabase dans Streamlit Secrets!")
+    st.error("⚠️ Erreur : Configurez vos clés dans Streamlit Secrets!")
+    st.info("Settings → Secrets → Ajoutez SUPABASE_URL et SUPABASE_KEY")
     st.stop()
 
 # Initialiser Supabase
