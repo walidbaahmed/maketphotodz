@@ -1,4 +1,5 @@
 streamlit
 Pillow
 pandas
-supabase==2.3.0
+supabase==1.0.3
+httpx==0.24.1
