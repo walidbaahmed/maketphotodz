@@ -21,10 +21,10 @@ st.set_page_config(
 )
 
 # ==================== CONFIGURATION SUPABASE ====================
-# Vos clés Supabase (NE PAS PARTAGER PUBLIQUEMENT)
+# Vos clés Supabase
 
 SUPABASE_URL = "https://majdvgokkvwjvtuqhncd.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hamR2Z29ra3Z3anZ0dXFobmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY0NDM2OTksImV4cCI6MjA1MjAxOTY5OX0.kFQ66UDBqYlV5W5wvsNTrA_Ugu5Bue1"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hamR2Z29ra3Z3anZ0dXFobmNkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzkwNjk1NywiZXhwIjoyMDgzNDgyOTU3fQ.8f_lDQEnllRaCDJsoZrR0n6uoBS-AquRJxWwgHSW4Uw"
 
 # Initialiser Supabase
 @st.cache_resource
