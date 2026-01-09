@@ -59,10 +59,18 @@ def init_supabase():
     if not SUPABASE_AVAILABLE:
         return None
     try:
-        return create_client(SUPABASE_URL, SUPABASE_KEY)
+        client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        # Tester la connexion
+        test = client.table('users').select('id').limit(1).execute()
+        st.sidebar.success(f"✅ Connexion Supabase OK")
+        return client
     except Exception as e:
-        st.error(f"Erreur connexion Supabase: {e}")
-        return None
+        st.sidebar.error(f"❌ Erreur connexion: {str(e)[:100]}")
+        # Essayer quand même de retourner le client
+        try:
+            return create_client(SUPABASE_URL, SUPABASE_KEY)
+        except:
+            return None
 
 supabase = init_supabase()
 
