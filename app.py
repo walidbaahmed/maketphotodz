@@ -18,8 +18,6 @@ st.set_page_config(
 
 if 'username' not in st.session_state:
     st.session_state.username = f"user_{datetime.now().timestamp()}"
-if 'user_id' not in st.session_state:
-    st.session_state.user_id = None
 if 'is_admin' not in st.session_state:
     st.session_state.is_admin = False
 if 'dark_mode' not in st.session_state:
@@ -209,8 +207,8 @@ def get_database_connection():
 
 conn = get_database_connection()
 
-# Initialiser l'ID utilisateur après la connexion DB
-if st.session_state.user_id is None:
+# Initialiser l'ID utilisateur après que toutes les fonctions soient définies
+if 'user_id' not in st.session_state:
     st.session_state.user_id = get_user_id(st.session_state.username)
 
 # ==================== FONCTIONS CRUD ====================
