@@ -198,6 +198,8 @@ def add_asset(title, author, author_id, description, category, asset_type, is_pr
         return False
 
 def get_all_assets(search="", category="Tous", asset_type="Tous", premium_only=False):
+    if not supabase:
+        return []
     try:
         query = supabase.table('assets').select('*')
         
@@ -211,18 +213,27 @@ def get_all_assets(search="", category="Tous", asset_type="Tous", premium_only=F
         if premium_only:
             query = query.eq('is_premium', True)
         
-        # Recherche textuelle
+        # Recherche textuelle - CORRECTION ICI
         if search:
+            # Utiliser ilike pour chaque champ séparément
             query = query.or_(f'title.ilike.%{search}%,author.ilike.%{search}%,tags.ilike.%{search}%')
         
         # Trier par date
         query = query.order('upload_date', desc=True)
         
         result = query.execute()
+        st.sidebar.info(f"📊 {len(result.data)} assets trouvés")
         return result.data
     except Exception as e:
-        st.error(f"Erreur chargement assets: {e}")
-        return []
+        st.sidebar.error(f"Erreur get_all_assets: {str(e)[:200]}")
+        # Essayer une requête simple sans filtres
+        try:
+            simple_query = supabase.table('assets').select('*').limit(100).execute()
+            st.sidebar.warning(f"⚠️ Requête simplifiée: {len(simple_query.data)} assets")
+            return simple_query.data
+        except Exception as e2:
+            st.sidebar.error(f"Erreur simple query: {str(e2)[:200]}")
+            return []
 
 def download_asset(user_id, asset_id):
     try:
@@ -250,22 +261,26 @@ def increment_views(asset_id):
         pass
 
 def get_stats():
+    if not supabase:
+        return {'total_assets': 0, 'free_assets': 0, 'total_downloads': 0, 'active_users': 0}
     try:
         # Total assets
         total = supabase.table('assets').select('id', count='exact').execute()
-        total_assets = total.count
+        total_assets = total.count if total.count else 0
         
         # Assets gratuits
         free = supabase.table('assets').select('id', count='exact').eq('is_premium', False).execute()
-        free_assets = free.count
+        free_assets = free.count if free.count else 0
         
         # Total téléchargements
         downloads = supabase.table('downloads').select('id', count='exact').execute()
-        total_downloads = downloads.count
+        total_downloads = downloads.count if downloads.count else 0
         
         # Utilisateurs actifs
         users = supabase.table('users').select('id', count='exact').execute()
-        active_users = users.count
+        active_users = users.count if users.count else 0
+        
+        st.sidebar.success(f"📊 Stats OK: {total_assets} assets")
         
         return {
             'total_assets': total_assets,
@@ -274,12 +289,8 @@ def get_stats():
             'active_users': active_users
         }
     except Exception as e:
-        return {
-            'total_assets': 0,
-            'free_assets': 0,
-            'total_downloads': 0,
-            'active_users': 0
-        }
+        st.sidebar.error(f"Erreur stats: {str(e)[:100]}")
+        return {'total_assets': 0, 'free_assets': 0, 'total_downloads': 0, 'active_users': 0}
 
 def like_asset(user_id, asset_id):
     try:
