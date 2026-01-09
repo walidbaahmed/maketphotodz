@@ -25,13 +25,21 @@ st.set_page_config(
 
 try:
     SUPABASE_URL = st.secrets["SUPABASE_URL"]
-    SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+    # Essayer d'abord SUPABASE_KEY, sinon SUPABASE_SERVICE_KEY
+    SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", st.secrets.get("SUPABASE_SERVICE_KEY"))
     
     # Debug : Afficher les infos (masquer la clé)
     st.sidebar.success("✅ Secrets chargés")
     st.sidebar.text(f"URL: {SUPABASE_URL}")
     st.sidebar.text(f"Key début: {SUPABASE_KEY[:30]}...")
     st.sidebar.text(f"Key fin: ...{SUPABASE_KEY[-30:]}")
+    st.sidebar.text(f"Longueur clé: {len(SUPABASE_KEY)} caractères")
+    
+    # Détecter le type de clé
+    if SUPABASE_KEY.startswith("sb_secret_"):
+        st.sidebar.warning("⚠️ Utilise service_role key")
+    elif "anon" in SUPABASE_KEY or len(SUPABASE_KEY) > 200:
+        st.sidebar.info("ℹ️ Utilise anon key")
     
 except KeyError as e:
     st.error(f"❌ Clé manquante dans Secrets: {e}")
