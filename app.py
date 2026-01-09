@@ -14,6 +14,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ==================== SESSION STATE (INITIALISER EN PREMIER) ====================
+
+if 'username' not in st.session_state:
+    st.session_state.username = f"user_{datetime.now().timestamp()}"
+if 'user_id' not in st.session_state:
+    st.session_state.user_id = None
+if 'is_admin' not in st.session_state:
+    st.session_state.is_admin = False
+if 'dark_mode' not in st.session_state:
+    st.session_state.dark_mode = True
+
 # CSS personnalisé
 if st.session_state.dark_mode:
     # Mode Sombre
@@ -198,6 +209,10 @@ def get_database_connection():
 
 conn = get_database_connection()
 
+# Initialiser l'ID utilisateur après la connexion DB
+if st.session_state.user_id is None:
+    st.session_state.user_id = get_user_id(st.session_state.username)
+
 # ==================== FONCTIONS CRUD ====================
 
 def add_photo(title, photographer, description, price, image_base64):
@@ -344,23 +359,18 @@ def get_top_photos():
     columns = ['Titre', 'Photographe', 'Téléchargements', 'Revenus (€)', 'Prix (€)']
     return pd.DataFrame(cursor.fetchall(), columns=columns)
 
-# ==================== SESSION STATE ====================
-
-if 'username' not in st.session_state:
-    st.session_state.username = f"user_{datetime.now().timestamp()}"
-if 'user_id' not in st.session_state:
-    st.session_state.user_id = get_user_id(st.session_state.username)
-if 'is_admin' not in st.session_state:
-    st.session_state.is_admin = False
-if 'dark_mode' not in st.session_state:
-    st.session_state.dark_mode = True
-
 # ==================== INTERFACE ====================
 
 # Sidebar
 with st.sidebar:
     st.title("📸 PhotoMarket")
     st.markdown(f"👤 **Utilisateur:** {st.session_state.username[:15]}...")
+    
+    # Bouton Mode Sombre/Clair
+    if st.button("🌓 " + ("Mode Clair" if st.session_state.dark_mode else "Mode Sombre")):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
+    
     st.markdown("---")
     
     # Toggle Admin Mode
@@ -551,8 +561,9 @@ else:
 
 # Footer
 st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #a78bfa;'>
+footer_color = "#a78bfa" if st.session_state.dark_mode else "#7c3aed"
+st.markdown(f"""
+<div style='text-align: center; color: {footer_color};'>
     <p>📸 PhotoMarket - Plateforme de vente de photos premium avec base de données SQLite</p>
     <p>Tous droits réservés © 2025</p>
 </div>
