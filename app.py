@@ -1,10 +1,16 @@
 import streamlit as st
-from supabase import create_client, Client
 from datetime import datetime
 import base64
 from io import BytesIO
 from PIL import Image
 import pandas as pd
+
+try:
+    from supabase import create_client, Client
+    SUPABASE_AVAILABLE = True
+except ImportError:
+    SUPABASE_AVAILABLE = False
+    st.error("⚠️ Supabase n'est pas installé. Utilisez: pip install supabase")
 
 # Configuration de la page
 st.set_page_config(
@@ -23,9 +29,15 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 # Initialiser Supabase
 @st.cache_resource
 def init_supabase():
-    return create_client(SUPABASE_URL, SUPABASE_KEY)
+    if not SUPABASE_AVAILABLE:
+        return None
+    try:
+        return create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception as e:
+        st.error(f"Erreur connexion Supabase: {e}")
+        return None
 
-supabase: Client = init_supabase()
+supabase = init_supabase()
 
 # ==================== SESSION STATE ====================
 
@@ -114,6 +126,8 @@ else:
 # ==================== FONCTIONS SUPABASE ====================
 
 def get_user_id(username):
+    if not supabase:
+        return 1
     try:
         # Vérifier si l'utilisateur existe
         result = supabase.table('users').select('id').eq('username', username).execute()
@@ -126,7 +140,7 @@ def get_user_id(username):
             return new_user.data[0]['id']
     except Exception as e:
         st.error(f"Erreur utilisateur: {e}")
-        return None
+        return 1
 
 def add_asset(title, author, author_id, description, category, asset_type, is_premium, price, image_base64, tags):
     try:
