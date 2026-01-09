@@ -21,19 +21,14 @@ st.set_page_config(
 )
 
 # ==================== CONFIGURATION SUPABASE ====================
-# Configuration temporaire pour debug
+# Les clés sont maintenant dans Streamlit Secrets (sécurisé)
 
-# Essayer d'abord les secrets, sinon utiliser valeurs par défaut
 try:
-    SUPABASE_URL = st.secrets.get("SUPABASE_URL", "https://majdvgokkvwjvtuqhncd.supabase.co")
-    SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hamR2Z29ra3Z3anZ0dXFobmNkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzkwNjk1NywiZXhwIjoyMDgzNDgyOTU3fQ.8f_lDQEnllRaCDJsoZrR0n6uoBS-AquRJxWwgHSW4Uw")
-except:
-    SUPABASE_URL = "https://majdvgokkvwjvtuqhncd.supabase.co"
-    SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hamR2Z29ra3Z3anZ0dXFobmNkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzkwNjk1NywiZXhwIjoyMDgzNDgyOTU3fQ.8f_lDQEnllRaCDJsoZrR0n6uoBS-AquRJxWwgHSW4Uw"
-
-# Afficher les infos de debug (masquer partiellement la clé)
-st.sidebar.text(f"URL: {SUPABASE_URL}")
-st.sidebar.text(f"Key: {SUPABASE_KEY[:20]}...{SUPABASE_KEY[-20:]}")
+    SUPABASE_URL = st.secrets["SUPABASE_URL"]
+    SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+except Exception as e:
+    st.error("⚠️ Configurez vos clés Supabase dans Streamlit Secrets!")
+    st.stop()
 
 # Initialiser Supabase
 @st.cache_resource
